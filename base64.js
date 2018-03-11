@@ -22,13 +22,6 @@
     // existing version for noConflict()
     var _Base64 = global.Base64;
     var version = "2.4.3";
-    // if node.js, we use Buffer
-    var buffer;
-    if (typeof module !== 'undefined' && module.exports) {
-        try {
-            buffer = require('buffer').Buffer;
-        } catch (err) {}
-    }
     // constants
     var b64chars
         = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
@@ -80,17 +73,7 @@
     } : function(b) {
         return b.replace(/[\s\S]{1,3}/g, cb_encode);
     };
-    var _encode = buffer ?
-        buffer.from && buffer.from !== Uint8Array.from ? function (u) {
-            return (u.constructor === buffer.constructor ? u : buffer.from(u))
-                .toString('base64')
-        }
-        :  function (u) {
-            return (u.constructor === buffer.constructor ? u : new  buffer(u))
-                .toString('base64')
-        }
-        : function (u) { return btoa(utob(u)) }
-    ;
+    var _encode = function (u) { return btoa(utob(u)) };
     var encode = function(u, urisafe) {
         return !urisafe
             ? _encode(String(u))
@@ -151,16 +134,7 @@
     } : function(a){
         return a.replace(/[\s\S]{1,4}/g, cb_decode);
     };
-    var _decode = buffer ?
-        buffer.from && buffer.from !== Uint8Array.from ? function(a) {
-            return (a.constructor === buffer.constructor
-                    ? a : buffer.from(a, 'base64')).toString();
-        }
-        : function(a) {
-            return (a.constructor === buffer.constructor
-                    ? a : new buffer(a, 'base64')).toString();
-        }
-        : function(a) { return btou(atob(a)) };
+    var _decode = function(a) { return btou(atob(a)) };
     var decode = function(a){
         return _decode(
             String(a).replace(/[-_]/g, function(m0) { return m0 == '-' ? '+' : '/' })
